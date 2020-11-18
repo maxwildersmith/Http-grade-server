@@ -1,0 +1,16 @@
+Enter height of trunk: 
+Please enter a positive number for height of trunk: 
+Enter width of trunk: 
+Please enter an odd number for width of trunk: 
+Enter width of leaves: 
+
+Please enter a number for width of leaves larger than 4: 
+Please enter a number for width of leaves larger than 4: 
+   *
+  ***
+ *****
+*******
+  ***
+  ***
+  ***
+  ***
