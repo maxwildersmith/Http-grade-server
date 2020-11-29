@@ -6,6 +6,11 @@
 #include <iostream>
 #include <fstream>
 #include <regex>
+#include <thread>
+#include <vector>
+#include <sys/types.h> 
+#include <sys/socket.h>
+#include <netinet/in.h>
 
 using namespace std;
 
@@ -50,6 +55,7 @@ bool generateKey(string name){
     char cmd[cmdS.length() + 1];
     strcpy(cmd, cmdS.c_str());
     system(cmd);
+    return true;
 }
 
 bool gradeAssignment(string name)
@@ -118,11 +124,138 @@ string createAssignment(string name, string key, string input = "")
     return "Successfuly created assignment";
 }
 
+void clientHandler(void *sockfd)
+{
+    char buffer[4096];
+    bzero(buffer, 4096);
+    int sock = *(int*)sockfd;
+    
+    read(sock, buffer, sizeof(buffer));
+    
+    string str(buffer);
+    
+    int spacepos = str.find(' ');
+    if (str.compare(0, spacepos, "GET") == 0)
+    {
+        string path, query, name, assignmentname;
+        int assignmentnamepos = 8;
+        int questpos = str.find('?');
+        path = str.substr((spacepos + 1), questpos);
+
+        if (str.find('?') != string::npos)
+        {
+            string grade;
+            spacepos = str.find(' ', questpos);
+            query = str.substr((questpos + 1), (spacepos - (questpos + 1)));
+            int equalpos = query.find('=');
+            name = query.substr(equalpos);
+            assignmentname = path.substr(assignmentnamepos);
+
+
+            if (name.compare("grades") == 0)
+            {
+                //need function that takes assignment name and returns grades.txt as a string
+            }
+            else
+            {
+                //need function that takes assignment name and student name and returns grade string
+            }
+        
+            char strbuffer[(grade.length() + 1)];
+            send(sock, strbuffer, sizeof(strbuffer), 0);
+        }
+        else
+        {
+            if (path.compare("/server") == 0)
+            {
+                string assignments;
+
+                //need assignments function to return list of assignments as string
+
+                char strbuffer[(assignments.length() + 1)];
+                send(sock, strbuffer, sizeof(strbuffer), 0);
+            }
+        }
+        
+    }
+    else if (str.compare(0, spacepos, "POST") == 0)
+    {
+        string path, query, name, assignmentname, grade, filetext;
+        int assignmentnamepos = 8;
+        int questpos = str.find('?');
+        path = str.substr((spacepos + 1), questpos);
+
+        if (path.length() == 7)
+        {
+            spacepos = str.find(' ', questpos);
+            query = str.substr((questpos + 1), (spacepos - (questpos + 1)));
+            int equalpos = query.find('=');
+            name = query.substr(equalpos);
+            int newlinepos = str.find('\n');
+            filetext = str.substr(newlinepos + 1);
+
+            string message = createAssignment(name, filetext);
+
+            char strbuffer[(message.length() + 1)];
+            send(sock, strbuffer, sizeof(strbuffer), 0);
+        }
+        else
+        {
+            spacepos = str.find(' ', questpos);
+            query = str.substr((questpos + 1), (spacepos - (questpos + 1)));
+            int equalpos = query.find('=');
+            name = query.substr(equalpos);
+            int newlinepos = str.find('\n');
+            filetext = str.substr(newlinepos + 1);
+            assignmentname = path.substr(assignmentnamepos);
+
+            //need updateGrades function and submitAssignment function
+
+            /*if (name.compare("grades"))
+                string message = updateGrades(assignmentname, filetext);
+            else
+                string message = submitAssignment(assignmentname, name, filetext);
+            
+            char strbuffer[(message.length() + 1)];
+            send(sock, strbuffer, sizeof(strbuffer), 0);*/
+        } 
+    }
+
+    close(sock);
+}
+
 int main()
 {
     cout << "Starting server..." << endl;
 
-    cout << createAssignment("test2","asdf\nasdf");
+    //cout << createAssignment("test2","asdf\nasdf");
+
+    int port = 5000;
+    int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    int csockfd;
+    socklen_t clientlength;
+    struct sockaddr_in saddr, caddr;
+    bzero((char *) &saddr, sizeof(saddr));
+
+    saddr.sin_family = AF_INET;
+    saddr.sin_addr.s_addr = htonl(INADDR_ANY);
+    saddr.sin_port = htons(port);
+
+    bind(sockfd, (struct sockaddr *) &saddr, sizeof(saddr));
+
+    listen(sockfd, 5);
+
+    clientlength = sizeof(caddr);
+    vector<thread> threads;
+
+    while(true)
+    {
+        csockfd = accept(sockfd, (struct sockaddr *) &caddr, &clientlength);
+        threads.emplace_back([&](){clientHandler(&csockfd);});
+    }
+
+
+
 
     //gradeAssignment("test");
     //cout << compareFiles("server/test/evitolo.txt","server/test/key.txt");
