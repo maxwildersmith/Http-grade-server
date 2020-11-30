@@ -145,18 +145,17 @@ void clientHandler(void *sockfd)
     read(sock, buffer, sizeof(buffer));
     
     string str(buffer);
-    
     int spacepos = str.find(' ');
     if (str.compare(0, spacepos, "GET") == 0)
     {
         string path, query, name, assignmentname;
         int assignmentnamepos = 8;
-        int questpos = str.find('?');
-        path = str.substr((spacepos + 1), questpos);
-
+        
         if (str.find('?') != string::npos)
         {
             string grade;
+            int questpos = str.find('?');
+            path = str.substr((spacepos + 1), (questpos - (spacepos + 1)));
             spacepos = str.find(' ', questpos);
             query = str.substr((questpos + 1), (spacepos - (questpos + 1)));
             int equalpos = query.find('=');
@@ -179,16 +178,13 @@ void clientHandler(void *sockfd)
         }
         else
         {
-            if (path.compare("/server") == 0)
-            {
-                string assignments;
+            string assignments;
 
-                assignments = getAssignments();
+            assignments = getAssignments();
 
-                char strbuffer[(assignments.length() + 1)];
-                strcpy(strbuffer, assignments.c_str());
-                send(sock, strbuffer, sizeof(strbuffer), 0);
-            }
+            char strbuffer[(assignments.length() + 1)];
+            strcpy(strbuffer, assignments.c_str());
+            send(sock, strbuffer, sizeof(strbuffer), 0);
         }
         
     }
@@ -197,7 +193,7 @@ void clientHandler(void *sockfd)
         string path, query, name, assignmentname, grade, filetext;
         int assignmentnamepos = 8;
         int questpos = str.find('?');
-        path = str.substr((spacepos + 1), questpos);
+        path = str.substr((spacepos + 1), (questpos - (spacepos + 1)));
 
         if (path.length() == 7)
         {
@@ -259,7 +255,7 @@ int main()
     saddr.sin_port = htons(port);
 
     bind(sockfd, (struct sockaddr *) &saddr, sizeof(saddr));
-
+   
     listen(sockfd, 5);
 
     clientlength = sizeof(caddr);
