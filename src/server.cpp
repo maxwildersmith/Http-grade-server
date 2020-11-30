@@ -10,7 +10,7 @@
 #include <vector>
 #include <sys/types.h> 
 #include <sys/socket.h>
-#include <netinet/in.h>
+#include <arpa/inet.h>
 
 using namespace std;
 
@@ -124,6 +124,18 @@ string createAssignment(string name, string key, string input = "")
     return "Successfuly created assignment";
 }
 
+string getAssignments(){
+    string out = "Assignments: ";
+    for (auto &p : filesystem::directory_iterator("server/")){
+        if(p.is_directory()){
+            out += p.path().filename().string()+" ";
+        }
+    }
+
+    return out;
+
+}
+
 void clientHandler(void *sockfd)
 {
     char buffer[4096];
@@ -171,7 +183,7 @@ void clientHandler(void *sockfd)
             {
                 string assignments;
 
-                //need assignments function to return list of assignments as string
+                assignments = getAssignments();
 
                 char strbuffer[(assignments.length() + 1)];
                 strcpy(strbuffer, assignments.c_str());
@@ -232,6 +244,7 @@ int main()
 {
     cout << "Starting server..." << endl;
 
+    // cout << getAssignments() << endl;
     //cout << createAssignment("test2","asdf\nasdf");
 
     int port = 5000;

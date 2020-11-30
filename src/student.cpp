@@ -2,10 +2,12 @@
 #include <cstdlib>
 #include <iostream>
 #include <unistd.h>
+#include <strings.h>
+#include <cstring>
 #include <fstream>
 #include <sys/types.h> 
 #include <sys/socket.h>
-#include <netinet/in.h>
+#include <arpa/inet.h>
 
 using namespace std;
 

@@ -3,9 +3,12 @@
 #include <iostream>
 #include <unistd.h>
 #include <fstream>
+#include <strings.h>
+#include <cstring>
+#include <string>
 #include <sys/types.h> 
 #include <sys/socket.h>
-#include <netinet/in.h>
+#include <arpa/inet.h>
 
 using namespace std;
 
@@ -17,6 +20,8 @@ void getAssignments(void *sockfd)
 
     send(sock, "GET /server HTTP/1.1", sizeof("GET /server HTTP/1.1") , 0); 
     read(sock, buffer, sizeof(buffer));
+
+    cout << buffer << "  ASDF"<<endl;
 
     printf("%s\n", buffer );
 }
@@ -83,8 +88,18 @@ int main()
 
     
     connect(sockfd, (struct sockaddr *)&saddr, sizeof(saddr));
+    cout << "Connected to the server..." << endl; 
+    getAssignments(&sockfd);
 
-    //getAssignments(&sockfd);
+    string input;
+    cin >> input;
+    
+    // do{
+
+    //     input << cin;
+    // } while (input.compare("q") != 0);
+
+    //getAssignments(&socskfd);
     //getGrades(&sockfd, assignmentname);
     //createAssignment(&sockfd, assignmentname, filetext);
     //updateGrades(&sockfd, assignmentname, filetext);
