@@ -162,6 +162,7 @@ void clientHandler(void *sockfd)
             }
         
             char strbuffer[(grade.length() + 1)];
+            strcpy(strbuffer, grade.c_str());
             send(sock, strbuffer, sizeof(strbuffer), 0);
         }
         else
@@ -173,6 +174,7 @@ void clientHandler(void *sockfd)
                 //need assignments function to return list of assignments as string
 
                 char strbuffer[(assignments.length() + 1)];
+                strcpy(strbuffer, assignments.c_str());
                 send(sock, strbuffer, sizeof(strbuffer), 0);
             }
         }
@@ -197,6 +199,7 @@ void clientHandler(void *sockfd)
             string message = createAssignment(name, filetext);
 
             char strbuffer[(message.length() + 1)];
+            strcpy(strbuffer, message.c_str());
             send(sock, strbuffer, sizeof(strbuffer), 0);
         }
         else
@@ -217,6 +220,7 @@ void clientHandler(void *sockfd)
                 string message = submitAssignment(assignmentname, name, filetext);
             
             char strbuffer[(message.length() + 1)];
+            strcpy(strbuffer, message.c_str());
             send(sock, strbuffer, sizeof(strbuffer), 0);*/
         } 
     }
