@@ -98,6 +98,25 @@ bool gradeAssignment(string name)
     return true;
 }
 
+void toFile(string fname, string content){
+    ofstream file(fname);
+    file << content;
+    file.close();
+}
+
+string getFile(string fname){
+    try{
+        ifstream file(fname);
+        ostringstream ss;
+        ss << file.rdbuf(); // reading data
+        return ss.str();
+    } catch(exception e){
+        cout << "ERROR OPENING FILE"<<endl;
+        return "";
+    }
+}
+
+
 bool updateInput(string name, string input)
 {
     fstream file;
@@ -145,6 +164,7 @@ void clientHandler(void *sockfd)
     read(sock, buffer, sizeof(buffer));
     
     string str(buffer);
+    cout << str;
     int spacepos = str.find(' ');
     if (str.compare(0, spacepos, "GET") == 0)
     {
@@ -165,10 +185,12 @@ void clientHandler(void *sockfd)
 
             if (name.compare("grades") == 0)
             {
+                grade = getFile(assignmentname);
                 //need function that takes assignment name and returns grades.txt as a string
             }
             else
             {
+                // DUE TO TIME, DROP THE STUDENT VIEWS THEIR GRADE FUNCTIONALITY
                 //need function that takes assignment name and student name and returns grade string
             }
         
@@ -179,7 +201,7 @@ void clientHandler(void *sockfd)
         else
         {
             string assignments;
-
+            cout << "Getting assignments..." << endl;
             assignments = getAssignments();
 
             char strbuffer[(assignments.length() + 1)];
@@ -221,6 +243,9 @@ void clientHandler(void *sockfd)
             assignmentname = path.substr(assignmentnamepos);
 
             //need updateGrades function and submitAssignment function
+            // TO UPDATE GRADES, JUST CALL THE GRADEASSIGNMENT() FUNCTION
+            // FOR SUBMITTING, USE TOFILE() TO WRITE A STRING TO A FILE, MAKE SURE THE FILENAME IS server/assignmentName/studentName.cpp
+            
 
             /*if (name.compare("grades"))
                 string message = updateGrades(assignmentname, filetext);
@@ -239,6 +264,7 @@ void clientHandler(void *sockfd)
 int main()
 {
     cout << "Starting server..." << endl;
+
 
     // cout << getAssignments() << endl;
     //cout << createAssignment("test2","asdf\nasdf");
