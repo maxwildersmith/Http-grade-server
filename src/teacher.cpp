@@ -24,6 +24,8 @@ void getAssignments(void *sockfd)
     cout << buffer << "  ASDF"<<endl;
 
     printf("%s\n", buffer );
+
+    close(sock);
 }
 
 void getGrades(void *sockfd, string assignmentname)
@@ -40,6 +42,8 @@ void getGrades(void *sockfd, string assignmentname)
     read(sock, buffer, sizeof(buffer));
 
     printf("%s\n", buffer);
+
+    close(sock);
 }
 
 void createAssignment(void *sockfd, string assignmentname, string filetext)
@@ -56,6 +60,8 @@ void createAssignment(void *sockfd, string assignmentname, string filetext)
     read(sock, buffer, sizeof(buffer));
 
     printf("%s\n", buffer);
+
+    close(sock);
 }
 
 void updateGrades(void *sockfd, string assignmentname, string filetext)

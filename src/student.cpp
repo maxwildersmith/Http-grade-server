@@ -21,6 +21,8 @@ void getAssignments(void *sockfd)
     read(sock, buffer, sizeof(buffer));
 
     printf("%s\n", buffer );
+
+    close(sock);
 }
 
 void getGrade(void *sockfd, string assignmentname, string studentname)
@@ -37,6 +39,8 @@ void getGrade(void *sockfd, string assignmentname, string studentname)
     read(sock, buffer, sizeof(buffer));
 
     printf("%s\n", buffer);
+
+    close(sock);
 }
 
 void postAssignment(void *sockfd, string assignmentname, string studentname, string filetext)
@@ -53,6 +57,8 @@ void postAssignment(void *sockfd, string assignmentname, string studentname, str
     read(sock, buffer, sizeof(buffer));
 
     printf("%s\n", buffer);
+
+    close(sock);
 }
    
 int main() 
@@ -70,7 +76,9 @@ int main()
     
     connect(sockfd, (struct sockaddr *)&saddr, sizeof(saddr));
     
-    //getAssignments(&sockfd);
+    getAssignments(&sockfd);
+
+    
     //getGrade(&sockfd, assignmentname, studentname);
     //postAssignment(&sockfd, assignmentname, studentname, filetext);
     
