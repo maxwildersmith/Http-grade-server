@@ -34,7 +34,7 @@ void getGrades(void *sockfd, string assignmentname)
     char buffer[4096];
     bzero(buffer, 4096);
 
-    string str = "GET /server/" + assignmentname + " " + "?name=grades HTTP/1.1";
+    string str = "GET /server/" + assignmentname + "?name=grades HTTP/1.1";
 
     char strbuffer[(str.length() + 1)];
     strcpy(strbuffer, str.c_str());
@@ -70,7 +70,7 @@ void updateGrades(void *sockfd, string assignmentname, string filetext)
     char buffer[4096];
     bzero(buffer, 4096);
 
-    string str = "POST /server/" + assignmentname + " " + "?name=grades HTTP/1.1\n" + filetext;
+    string str = "POST /server/" + assignmentname + "?name=grades HTTP/1.1\n" + filetext;
 
     char strbuffer[(str.length() + 1)];
     strcpy(strbuffer, str.c_str());
@@ -93,24 +93,12 @@ string getFile(string fname){
 }
 
 void help(){
-    cout << "Commands for teacher:\n\tls - list current assignments\n\tget <name> - gets the grade for the assignment of name\n\tcreate <name> <filepath> - creates an assignment of the specified name and uploads the specified file as the solution.cpp (use updateI to add input values)\n\tupdate <name> - updates the answer key's c++\n\tupdateI <name> - updates the input file for the given assignment\n\tupdateG <name> - updates the grades for an assignment" << endl;
+    cout << "Commands for teacher:\n\tls - list current assignments\n\tget <name> - gets the grade for the assignment of name\n\tcreate <name> <filepath> - creates an assignment of the specified name and uploads the specified file as the solution.cpp (use updateI to add input values)\n\tupdate <name> - updates the answer key's c++\n\tupdateI <name> - updates the input file for the given assignment\n\tupdateG <name> <filepath>- updates the grades for an assignment" << endl;
 }
    
 int main() 
 { 
-    int sockfd; 
-    struct sockaddr_in saddr;
-    sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    saddr.sin_family = AF_INET; 
-    saddr.sin_port = htons(5000);   
-    inet_pton(AF_INET, "127.0.0.1", &saddr.sin_addr);
-
-
-    //get user input command
-
     
-    connect(sockfd, (struct sockaddr *)&saddr, sizeof(saddr));
-    cout << "Connected to the server..." << endl; 
     help();
     //getAssignments(&sockfd);
 
@@ -120,6 +108,15 @@ int main()
     cin >> input;
     
     while (input.compare("q") != 0){
+        int sockfd; 
+        struct sockaddr_in saddr;
+        sockfd = socket(AF_INET, SOCK_STREAM, 0);
+        saddr.sin_family = AF_INET; 
+        saddr.sin_port = htons(5000);   
+        inet_pton(AF_INET, "127.0.0.1", &saddr.sin_addr);
+
+        connect(sockfd, (struct sockaddr *)&saddr, sizeof(saddr));
+        
         cout << "    - "<<input<<" -"<<endl;
         if(input.compare("ls") == 0){
             getAssignments(&sockfd);

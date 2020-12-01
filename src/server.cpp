@@ -106,7 +106,7 @@ void toFile(string fname, string content){
 
 string getFile(string fname){
     try{
-        ifstream file(fname);
+        ifstream file("server/" + fname + "/grades.txt");
         ostringstream ss;
         ss << file.rdbuf(); // reading data
         return ss.str();
@@ -164,7 +164,6 @@ void clientHandler(void *sockfd)
     read(sock, buffer, sizeof(buffer));
     
     string str(buffer);
-    cout << str;
     int spacepos = str.find(' ');
     if (str.compare(0, spacepos, "GET") == 0)
     {
@@ -179,9 +178,8 @@ void clientHandler(void *sockfd)
             spacepos = str.find(' ', questpos);
             query = str.substr((questpos + 1), (spacepos - (questpos + 1)));
             int equalpos = query.find('=');
-            name = query.substr(equalpos);
+            name = query.substr(equalpos + 1);
             assignmentname = path.substr(assignmentnamepos);
-
 
             if (name.compare("grades") == 0)
             {
@@ -193,7 +191,6 @@ void clientHandler(void *sockfd)
                 // DUE TO TIME, DROP THE STUDENT VIEWS THEIR GRADE FUNCTIONALITY
                 //need function that takes assignment name and student name and returns grade string
             }
-        
             char strbuffer[(grade.length() + 1)];
             strcpy(strbuffer, grade.c_str());
             send(sock, strbuffer, sizeof(strbuffer), 0);
@@ -222,10 +219,9 @@ void clientHandler(void *sockfd)
             spacepos = str.find(' ', questpos);
             query = str.substr((questpos + 1), (spacepos - (questpos + 1)));
             int equalpos = query.find('=');
-            name = query.substr(equalpos);
+            name = query.substr(equalpos + 1);
             int newlinepos = str.find('\n');
             filetext = str.substr(newlinepos + 1);
-
             string message = createAssignment(name, filetext);
 
             char strbuffer[(message.length() + 1)];
@@ -237,7 +233,7 @@ void clientHandler(void *sockfd)
             spacepos = str.find(' ', questpos);
             query = str.substr((questpos + 1), (spacepos - (questpos + 1)));
             int equalpos = query.find('=');
-            name = query.substr(equalpos);
+            name = query.substr(equalpos + 1);
             int newlinepos = str.find('\n');
             filetext = str.substr(newlinepos + 1);
             assignmentname = path.substr(assignmentnamepos);
@@ -246,15 +242,30 @@ void clientHandler(void *sockfd)
             // TO UPDATE GRADES, JUST CALL THE GRADEASSIGNMENT() FUNCTION
             // FOR SUBMITTING, USE TOFILE() TO WRITE A STRING TO A FILE, MAKE SURE THE FILENAME IS server/assignmentName/studentName.cpp
             
-
-            /*if (name.compare("grades"))
-                string message = updateGrades(assignmentname, filetext);
+            string message;
+            if (name.compare("grades") == 0)
+            {
+                string filename = "server/" + assignmentname + "/" + name + ".txt";
+                toFile(filename, filetext);
+                message = "Grades file has been submitted";
+            }
             else
-                string message = submitAssignment(assignmentname, name, filetext);
-            
+            {
+                if (validName(assignmentname))
+                {
+                    string filename = "server/" + assignmentname + "/" + name + ".cpp";
+                    toFile(filename, filetext);
+                    message = "Assignment has been submitted successfully";
+                }
+                else
+                {
+                    message = "Not a valid assignment name";
+                }
+                
+            }
             char strbuffer[(message.length() + 1)];
             strcpy(strbuffer, message.c_str());
-            send(sock, strbuffer, sizeof(strbuffer), 0);*/
+            send(sock, strbuffer, sizeof(strbuffer), 0);
         } 
     }
 
