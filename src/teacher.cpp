@@ -13,6 +13,12 @@
 
 using namespace std;
 
+void toFile(string fname, string content){
+    ofstream file(fname);
+    file << content;
+    file.close();
+}
+
 void getAssignments(void *sockfd)
 {
     int sock = *(int*)sockfd;
@@ -41,7 +47,8 @@ void getGrades(void *sockfd, string assignmentname)
     send(sock, strbuffer, sizeof(strbuffer) , 0); 
     read(sock, buffer, sizeof(buffer));
 
-    printf("%s\n", buffer);
+    toFile("grades.txt", buffer);
+    cout << "The grades have been printed to a file called grades.txt" << endl;
 
     close(sock);
 }
@@ -80,6 +87,38 @@ void updateGrades(void *sockfd, string assignmentname, string filetext)
     printf("%s\n", buffer);
 }
 
+void updateKey(void *sockfd, string assignmentname, string filetext)
+{
+    int sock = *(int*)sockfd;
+    char buffer[4096];
+    bzero(buffer, 4096);
+
+    string str = "POST /server/" + assignmentname + "?name=key HTTP/1.1\n" + filetext;
+
+    char strbuffer[(str.length() + 1)];
+    strcpy(strbuffer, str.c_str());
+    send(sock, strbuffer, sizeof(strbuffer) , 0); 
+    read(sock, buffer, sizeof(buffer));
+
+    printf("%s\n", buffer);
+}
+
+void updateInput(void *sockfd, string assignmentname, string filetext)
+{
+    int sock = *(int*)sockfd;
+    char buffer[4096];
+    bzero(buffer, 4096);
+
+    string str = "POST /server/" + assignmentname + "?name=input HTTP/1.1\n" + filetext;
+
+    char strbuffer[(str.length() + 1)];
+    strcpy(strbuffer, str.c_str());
+    send(sock, strbuffer, sizeof(strbuffer) , 0); 
+    read(sock, buffer, sizeof(buffer));
+
+    printf("%s\n", buffer);
+}
+
 string getFile(string fname){
     try{
         ifstream file(fname);
@@ -93,14 +132,13 @@ string getFile(string fname){
 }
 
 void help(){
-    cout << "Commands for teacher:\n\tls - list current assignments\n\tget <name> - gets the grade for the assignment of name\n\tcreate <name> <filepath> - creates an assignment of the specified name and uploads the specified file as the solution.cpp (use updateI to add input values)\n\tupdate <name> - updates the answer key's c++\n\tupdateI <name> - updates the input file for the given assignment\n\tupdateG <name> <filepath>- updates the grades for an assignment" << endl;
+    cout << "Commands for teacher:\n\tls - list current assignments\n\tget <name> - gets the grade for the assignment of name\n\tcreate <name> <filepath> - creates an assignment of the specified name and uploads the specified file as the solution.cpp (use updateI to add input values)\n\tupdate <name> <filepath> - updates the answer key's c++\n\tupdateI <name> <filepath> - updates the input file for the given assignment\n\tupdateG <name> <filepath> - updates the grades for an assignment" << endl;
 }
    
 int main() 
 { 
     
     help();
-    //getAssignments(&sockfd);
 
     string input;
     string aname;
@@ -132,13 +170,13 @@ int main()
             cin >> fname;
 
             // Should be replaced with an update answer key function, same parameters
-            createAssignment(&sockfd, aname, getFile(fname));
+            updateKey(&sockfd, aname, getFile(fname));
         } else if(input.compare("updateI") == 0){
             cin >> aname;
             cin >> fname;
 
             // Should be replaced with an update input function, same parameters
-            createAssignment(&sockfd, aname, getFile(fname));
+            updateInput(&sockfd, aname, getFile(fname));
         } else if(input.compare("updateG") == 0){
             cin >> aname;
             cin >> fname;

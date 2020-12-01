@@ -14,6 +14,9 @@
 
 using namespace std;
 
+bool generateKey(string name);
+bool gradeAssignment(string name);
+
 bool validName(string name)
 {
     regex txt_regex("[A-Z]|\\.|\\\\|\\/");
@@ -23,9 +26,11 @@ bool validName(string name)
 bool updateKey(string name, string key)
 {
     fstream file;
-    file.open("server/" + name + "/key.txt", ios::out);
+    file.open("server/" + name + "/key.cpp", ios::out);
     file << key;
     file.close();
+    generateKey(name);
+    gradeAssignment(name);
     return true;
 }
 
@@ -51,7 +56,7 @@ bool compareFiles(string p1, string p2) {
 }
 
 bool generateKey(string name){
-    string cmdS = "g++ server/"+name+"/key.cpp -std=c++2a -o server/" + name + "/key.out && ./server/" + name + "/key.out < server/" + name + "/key.txt > server/" + name + "/key.txt";
+    string cmdS = "g++ server/"+name+"/key.cpp -std=c++2a -o server/" + name + "/key.out && ./server/" + name + "/key.out < server/" + name + "/input.txt > server/" + name + "/key.txt";
     char cmd[cmdS.length() + 1];
     strcpy(cmd, cmdS.c_str());
     system(cmd);
@@ -116,6 +121,13 @@ string getFile(string fname){
     }
 }
 
+string getGrade(string name, string stuName){
+    string grades = getFile(name);
+    string search = stuName+":";
+    size_t start = grades.rfind(search)+search.length();
+    grades = grades.substr(start);
+    return grades.substr(0,grades.find_first_of("\n"));
+}
 
 bool updateInput(string name, string input)
 {
@@ -123,6 +135,8 @@ bool updateInput(string name, string input)
     file.open("server/" + name + "/input.txt", ios::out);
     file << input;
     file.close();
+    generateKey(name);
+    gradeAssignment(name);
     return true;
 }
 
@@ -137,9 +151,10 @@ string createAssignment(string name, string key, string input = "")
 
     if (!updateKey(name, key))
         return "Error creating key";
-    if (!updateInput(name, key))
+    if (!updateInput(name, input))
         return "Error creating input file";
 
+    generateKey(name);
     return "Successfuly created assignment";
 }
 
@@ -184,12 +199,10 @@ void clientHandler(void *sockfd)
             if (name.compare("grades") == 0)
             {
                 grade = getFile(assignmentname);
-                //need function that takes assignment name and returns grades.txt as a string
             }
             else
             {
-                // DUE TO TIME, DROP THE STUDENT VIEWS THEIR GRADE FUNCTIONALITY
-                //need function that takes assignment name and student name and returns grade string
+                grade = getGrade(assignmentname, name);
             }
             char strbuffer[(grade.length() + 1)];
             strcpy(strbuffer, grade.c_str());
@@ -249,6 +262,22 @@ void clientHandler(void *sockfd)
                 toFile(filename, filetext);
                 message = "Grades file has been submitted";
             }
+            else if (name.compare("key") == 0)
+            {
+                string filename = "server/" + assignmentname + "/" + name + ".cpp";
+                toFile(filename, filetext);
+                message = "Key has been updated";
+                generateKey(assignmentname);
+                gradeAssignment(assignmentname);
+            }
+            else if (name.compare("input") == 0)
+            {
+                string filename = "server/" + assignmentname + "/" + name + ".txt";
+                toFile(filename, filetext);
+                message = "Input has been updated";
+                generateKey(assignmentname);
+                gradeAssignment(assignmentname);
+            }
             else
             {
                 if (validName(assignmentname))
@@ -256,6 +285,7 @@ void clientHandler(void *sockfd)
                     string filename = "server/" + assignmentname + "/" + name + ".cpp";
                     toFile(filename, filetext);
                     message = "Assignment has been submitted successfully";
+                    gradeAssignment(assignmentname);
                 }
                 else
                 {

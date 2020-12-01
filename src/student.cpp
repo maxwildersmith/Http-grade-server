@@ -75,7 +75,7 @@ string getFile(string fname){
 }
 
 void help(){
-    cout << "Commands for student:\n\tls - list current assignments\n\tsubmit <name> <filepath> - submits an assignment to the specified assignment name from the specified file" << endl;
+    cout << "Commands for student:\n\tls - list current assignments\n\tget <name> - get your grade for the specific assignment\n\tsubmit <name> <filepath> - submits an assignment to the specified assignment name from the specified file" << endl;
 }
    
 int main() 
@@ -104,8 +104,10 @@ int main()
         cout << "    - "<<input<<" -"<<endl;
         if(input.compare("ls") == 0){
             getAssignments(&sockfd);
+        } else if(input.compare("get") == 0){
+            cin >> aname;
+            getGrade(&sockfd, aname, sname);
         } else if(input.compare("submit") == 0){
-            //studentname
             cin >> aname;
             cin >> fname;
             postAssignment(&sockfd, aname, sname, getFile(fname));
