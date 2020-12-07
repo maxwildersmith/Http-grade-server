@@ -47,8 +47,9 @@ void getGrades(void *sockfd, string assignmentname)
     send(sock, strbuffer, sizeof(strbuffer) , 0); 
     read(sock, buffer, sizeof(buffer));
 
+    cout << buffer << endl;
     toFile("grades.txt", buffer);
-    cout << "The grades have been printed to a file called grades.txt" << endl;
+    cout << "The grades have also been printed to a file called grades.txt" << endl;
 
     close(sock);
 }
@@ -168,19 +169,14 @@ int main()
         } else if(input.compare("update") == 0){
             cin >> aname;
             cin >> fname;
-
-            // Should be replaced with an update answer key function, same parameters
             updateKey(&sockfd, aname, getFile(fname));
         } else if(input.compare("updateI") == 0){
             cin >> aname;
             cin >> fname;
-
-            // Should be replaced with an update input function, same parameters
             updateInput(&sockfd, aname, getFile(fname));
         } else if(input.compare("updateG") == 0){
             cin >> aname;
             cin >> fname;
-
             updateGrades(&sockfd, aname, getFile(fname));
         } else if(input.compare("help") == 0){
             help();
@@ -191,12 +187,6 @@ int main()
         cin >> input;
 
     } 
-
-    //getAssignments(&socskfd);
-    //getGrades(&sockfd, assignmentname);
-    //createAssignment(&sockfd, assignmentname, filetext);
-    //updateGrades(&sockfd, assignmentname, filetext);
-     
     
     return 0; 
 } 

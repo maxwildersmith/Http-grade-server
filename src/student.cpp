@@ -120,10 +120,6 @@ int main()
         cin >> input;
 
     } 
-
-    
-    //getGrade(&sockfd, assignmentname, studentname);
-    //postAssignment(&sockfd, assignmentname, studentname, filetext);
     
     return 0; 
 } 

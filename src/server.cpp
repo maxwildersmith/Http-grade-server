@@ -29,8 +29,6 @@ bool updateKey(string name, string key)
     file.open("server/" + name + "/key.cpp", ios::out);
     file << key;
     file.close();
-    generateKey(name);
-    gradeAssignment(name);
     return true;
 }
 
@@ -211,7 +209,6 @@ void clientHandler(void *sockfd)
         else
         {
             string assignments;
-            cout << "Getting assignments..." << endl;
             assignments = getAssignments();
 
             char strbuffer[(assignments.length() + 1)];
@@ -251,10 +248,6 @@ void clientHandler(void *sockfd)
             filetext = str.substr(newlinepos + 1);
             assignmentname = path.substr(assignmentnamepos);
 
-            //need updateGrades function and submitAssignment function
-            // TO UPDATE GRADES, JUST CALL THE GRADEASSIGNMENT() FUNCTION
-            // FOR SUBMITTING, USE TOFILE() TO WRITE A STRING TO A FILE, MAKE SURE THE FILENAME IS server/assignmentName/studentName.cpp
-            
             string message;
             if (name.compare("grades") == 0)
             {
@@ -306,10 +299,6 @@ int main()
 {
     cout << "Starting server..." << endl;
 
-
-    // cout << getAssignments() << endl;
-    //cout << createAssignment("test2","asdf\nasdf");
-
     int port = 5000;
     int sockfd = socket(AF_INET, SOCK_STREAM, 0);
     int csockfd;
@@ -333,14 +322,6 @@ int main()
         csockfd = accept(sockfd, (struct sockaddr *) &caddr, &clientlength);
         threads.emplace_back([&](){clientHandler(&csockfd);});
     }
-
-
-
-
-    //gradeAssignment("test");
-    //cout << compareFiles("server/test/evitolo.txt","server/test/key.txt");
-
-    //system("./test.out < vals > ");
 
     return 1;
 }
